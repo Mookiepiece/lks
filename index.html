@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https://www.google.com/s2/favicons?sz=64&domain=xiangjianan.github.io/lks/"
+    />
+    <title>LKs 网站推荐合集 (Mookiepiece Remix)</title>
+    <meta
+      name="description"
+      content="B站博主 [LKs](https://space.bilibili.com/125526) 网站推荐合集的修改版, 原站点为 https://github.com/xiangjianan/lks"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <header>LKs 网站推荐合集 <a href="https://github.com/Mookiepiece/lks">(Mookiepiece Remix)</a> | <span>原作 Copyright © 2022 <a href="https://space.bilibili.com/125526/" rel="nofollow noreferrer" target="_blank">-LKs-</a> <a href="https://github.com/xiangjianan/" rel="nofollow noreferrer" target="_blank">xiangjianan</a>｜<a class="github" href="https://github.com/xiangjianan/lks" rel="nofollow noreferrer" target="_blank">开源代码</a></header>
+    <main></main>
+
+    <script type="module">
+      /** @type {typeof document.querySelector} */
+      const $ = document.querySelector.bind(document);
+      /** @type {<K extends keyof HTMLElementTagNameMap>(_:K)=>HTMLElementTagNameMap[K][]} */
+      const $$ = (_) => [...document.querySelectorAll(_)];
+
+      const origin = location.origin + "/lks";
+
+      $("main").innerHTML = "...";
+
+      function xss(text) {
+        const tempElement = document.createElement("div");
+        tempElement.textContent = text;
+        return tempElement.innerHTML;
+      }
+
+      /** @type {{
+        "kind": string;
+        "id": number;
+        "title": string;
+        "href": string;
+        "slogan": string;
+        "kind_name": string;
+      }[]} */
+      const data = await fetch(origin + "/web.v12.json")
+        .then((res) => res.json())
+        .catch((err) => {
+          $("main").innerHTML = err.message;
+        });
+
+      /** @type {{
+        [key:string]: typeof data;
+      }} */
+      const dataByGroup = {};
+      for (const item of data) {
+        (dataByGroup[item.kind] ||= []).push(item);
+      }
+
+      $("main").innerHTML = `
+      ${Object.entries(dataByGroup)
+        .map(([group, data]) => {
+          group = group.slice("web_".length);
+          return `<section>
+            <h6>
+              <a href="#${group}">#${group}</a>
+            </h6>
+            <div>
+              ${data
+                .map(({ kind, id, title, href, slogan, kind_name }) => {
+                  const host = new URL(href).host;
+                  let path = href.slice((new URL(href).protocol + "//").length);
+                  path.endsWith("/") && (path = path.slice(0, -1));
+
+                  const ico = `https://www.google.com/s2/favicons?sz=64&domain=${host}`;
+
+                  title = title.replace(
+                    ` <span class='iconfont'>&#xe64b;</span>`,
+                    "⭐"
+                  );
+
+                  return `
+                    <a class="card" href="${href}" target="_blank" rel="noopener noreferrer">
+                      <img src="${ico}" alt="Site logo" />
+                      <h2>${xss(title)}</h2>
+                      <p>${slogan}</p>
+                      <p>${path}</p>
+                      <p>${kind_name}</p>
+                    </a>
+                  `;
+                })
+                .join("")}
+            </div>
+          </section>`;
+        })
+        .join("")}
+      `;
+    </script>
+
+    <style>
+      :root {
+        --color-pink-300: oklch(82.3% 0.12 346.018);
+        --color-pink-500: oklch(65.6% 0.241 354.308);
+        --color-pink-600: oklch(59.2% 0.249 0.584);
+
+        --color-stone-50: oklch(0.985 0.001 106.423);
+        --color-stone-100: oklch(0.97 0.001 106.424);
+        --color-stone-200: oklch(0.923 0.003 48.717);
+        --color-stone-300: oklch(0.869 0.005 56.366);
+        --color-stone-400: oklch(0.709 0.01 56.259);
+        --color-stone-500: oklch(0.553 0.013 58.071);
+        --color-stone-600: oklch(0.444 0.011 73.639);
+        --color-stone-700: oklch(0.374 0.01 67.558);
+        --color-stone-800: oklch(0.268 0.007 34.298);
+        --color-stone-900: oklch(0.216 0.006 56.043);
+        --color-stone-950: oklch(0.147 0.004 49.25);
+
+        --bg: oklch(97% 0.001 106.424);
+        --card: oklch(98.5% 0.001 106.423);
+        --border: oklch(86.9% 0.005 56.366);
+        --f1: oklch(26.8% 0.007 34.298);
+        --primary: var(--color-pink-600);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: var(--color-stone-800);
+          --card: var(--color-stone-600);
+          --border: var(--color-stone-500);
+          --f1: var(--color-stone-300);
+          --primary: var(--color-pink-300);
+        }
+      }
+
+      h2,
+      p {
+        margin: 0;
+      }
+
+      header a {
+        color: inherit;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--f1);
+
+        word-break: break-all;
+      }
+      header {
+        padding: 20px 20px 0;
+        font-size: 12px;
+      }
+      section {
+        padding: 20px;
+      }
+      section h6 a {
+        color: var(--primary);
+      }
+      section > div {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+      }
+      .card {
+        display: grid;
+        grid: auto-flow auto / 20px 1fr;
+        row-gap: 10px;
+        padding: 20px;
+        background-color: var(--card);
+        border: 1px solid var(--border);
+      }
+      .card:hover {
+        background-color: color-mix(in srgb, var(--border) 20%, var(--card));
+      }
+      a.card {
+        text-decoration: none;
+        color: inherit;
+        font-size: 12px;
+        line-height: 1.2;
+      }
+      .card h2 {
+        margin-left: 5px;
+        font-size: 14px;
+        line-height: 20px;
+      }
+
+      .card p {
+        grid-column: span 2;
+      }
+
+      .card p:nth-child(4) {
+        opacity: 0.7;
+        color: var(--primary);
+      }
+      @media (prefers-color-scheme: dark) {
+        .card p:nth-child(4) {
+          opacity: 1;
+        }
+      }
+
+      .card p:last-child {
+        opacity: 0.7;
+      }
+
+      img {
+        display: inline-block;
+        width: 20px;
+        aspect-ratio: 1;
+        object-fit: contain;
+        margin-inline: auto;
+      }
+    </style>
+  </body>
+</html>

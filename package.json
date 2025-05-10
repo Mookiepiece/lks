@@ -1,0 +1,16 @@
+{
+  "name": "lks",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "pub": "node publish.js"
+  },
+  "devDependencies": {
+    "@types/gh-pages": "^6.1.0",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "gh-pages": "^6.3.0"
+  }
+}
